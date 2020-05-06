@@ -1,0 +1,44 @@
+# This script runs a simulation loop to generate cohesive energy values for a range of lattice distances.
+
+#--------------------------- Simulation variables -----------------------------#
+  variable 	   i loop 600
+  variable 	   a equal 2+0.005*$i
+#------------------------------------------------------------------------------#
+
+#---------------------------- Atomic setup ------------------------------------#
+  units 	   metal
+  dimension	   3
+  boundary	   p p p
+
+  # Create atoms.
+  lattice          bcc ${a}
+  region           sim_box block 0 8 0 8 0 8
+  create_box       1 sim_box
+  create_atoms     1 box
+
+  # Define interatomic potential.
+  pair_style       eam
+  pair_coeff       * * Ni_u3.eam
+  neigh_modify     delay 0
+#------------------------------------------------------------------------------#
+
+#----------------------------- Run simulation ---------------------------------#
+  # Compute
+  thermo	   1
+  thermo_style     custom step pe atoms
+
+  run 		   1
+
+  variable	   atoms equal "atoms"
+  variable	   pe equal "pe"
+  variable	   ce equal "v_pe/v_atoms"
+  # Output
+  print 	  "$a ${ce}" append Ni_FCC.dat
+#------------------------------------------------------------------------------#
+
+#----------------------------- Loop procedure ---------------------------------#
+  # Looping
+  clear
+  next 		   i
+  jump 		   in.txt
+#------------------------------------------------------------------------------#

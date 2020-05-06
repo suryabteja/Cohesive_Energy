@@ -1,0 +1,5 @@
+in          input file
+log_bcc     log file (describes the process of run)
+Ni_BCC.dat  output file (contains energy vs lattice distance values)
+Ni_u3.eam   interatomic potential file
+plot        python-matplotlib code for plotting

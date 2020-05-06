@@ -1,7 +1,8 @@
 # This script runs a simulation loop to generate cohesive energy values for a range of lattice distances.
+# The '#' denotes a comment. Hence LAMMPS does not do anything for these lines.
 
 #--------------------------- Simulation variables -----------------------------#
-  variable 	   i loop 600
+  variable 	   i loop 600     # i value increases from 1 to 600 every it performs a loop
   variable 	   a equal 2+0.005*$i
 #------------------------------------------------------------------------------#
 
@@ -10,30 +11,43 @@
   dimension	   3
   boundary	   p p p
 
+#This section initializes the simulations. The 'units' command specifies the units that will be used for the rest of the simulation; #'metal' uses Angstroms and eV. The 'dimension 3' command specifies a 3-dimensional simulation cell will be used (2-D is also an #option). The 'boundary p p p' specifies periodic boundaries in the x-, y-, and z-direction.
+
   # Create atoms.
   lattice          bcc ${a}
   region           sim_box block 0 8 0 8 0 8
   create_box       1 sim_box
   create_atoms     1 box
 
+#The 'lattice' command specifies what type of lattice is used (fcc, bcc, hcp, etc.) and the number following this specifies the lattice #constant. The 'region' command specifies the simulation cell. Here, we have used lattice units and specified that the simulation cell #box is to be 8 lattice unit in each direction. The 'create_box' command following this will use the parameters outlined in the 'region' #command to actually create the box. 
+
   # Define interatomic potential.
   pair_style       eam
   pair_coeff       * * Ni_u3.eam
   neigh_modify     delay 0
+  
+#The 'pair_style' command specifies what kind of interatomic potential will be used, while the 'pair_coeff' specifies the file that the #pair potential coefficients are stored in. HINT: the potential extension can sometimes give a clue as to which format is being used.
+
 #------------------------------------------------------------------------------#
 
 #----------------------------- Run simulation ---------------------------------#
   # Compute
   thermo	   1
   thermo_style     custom step pe atoms
+  
+#The 'thermo' specifies the output by simulation. The 'thermo_style' specifies what type of output is shown to screen  
 
   run 		   1
 
+# The 'run' specifies no to times calculations have to be performed
+ 
   variable	   atoms equal "atoms"
   variable	   pe equal "pe"
   variable	   ce equal "v_pe/v_atoms"
   # Output
   print 	  "$a ${ce}" append Ni_FCC.dat
+ 
+# The 'print' command write the required outputs to be written in a text format to file name 'Ni_FCC.dat'. 
 #------------------------------------------------------------------------------#
 
 #----------------------------- Loop procedure ---------------------------------#
@@ -41,4 +55,6 @@
   clear
   next 		   i
   jump 		   in.txt
+  
+# The 'next' command increases the i value everytime the command is executed. The 'jump' command runs the specified file once the #simulation is completed.
 #------------------------------------------------------------------------------#
